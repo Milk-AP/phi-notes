@@ -1,17 +1,17 @@
 # ---------------------------------------------------------------------------
 # MkDocs Material 配置
-#   站点归属：Milk_AP / phi-notes
-#   如需更换用户名或仓库名，重跑：python scripts/publish.py
+#   站点归属：Milk-AP / boke
+#   仓库地址：https://github.com/Milk-AP/boke
 #   ⚠️ 仓库名必须与 GitHub 上的实际仓库名一致，
 #      否则 Pages 站点会挂在 /仓库名/ 子路径下，导致样式与链接 404。
 # ---------------------------------------------------------------------------
 
 site_name: Phigros 4.0.0 包结构逆向研究笔记
 site_description: 非官方 · 个人学习研究 | Unity IL2CPP 包体结构与方法学笔记
-site_author: Milk_AP
-site_url: https://Milk_AP.github.io/phi-notes/
-repo_url: https://github.com/Milk_AP/phi-notes
-repo_name: Milk_AP/phi-notes
+site_author: Milk-AP
+site_url: https://Milk-AP.github.io/boke/
+repo_url: https://github.com/Milk-AP/boke
+repo_name: Milk-AP/boke
 edit_uri: edit/main/docs/
 copyright: >-
   《Phigros》相关名称与内容权利归南京鸽游网络有限公司及各自权利人所有。
@@ -94,5 +94,5 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/Milk_AP/phi-notes
+      link: https://github.com/Milk-AP/boke
       name: 本站在 GitHub 上的源码
