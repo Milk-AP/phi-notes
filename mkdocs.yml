@@ -1,0 +1,98 @@
+# ---------------------------------------------------------------------------
+# MkDocs Material 配置
+#   站点归属：Milk_AP / phi-notes
+#   如需更换用户名或仓库名，重跑：python scripts/publish.py
+#   ⚠️ 仓库名必须与 GitHub 上的实际仓库名一致，
+#      否则 Pages 站点会挂在 /仓库名/ 子路径下，导致样式与链接 404。
+# ---------------------------------------------------------------------------
+
+site_name: Phigros 4.0.0 包结构逆向研究笔记
+site_description: 非官方 · 个人学习研究 | Unity IL2CPP 包体结构与方法学笔记
+site_author: Milk_AP
+site_url: https://Milk_AP.github.io/phi-notes/
+repo_url: https://github.com/Milk_AP/phi-notes
+repo_name: Milk_AP/phi-notes
+edit_uri: edit/main/docs/
+copyright: >-
+  《Phigros》相关名称与内容权利归南京鸽游网络有限公司及各自权利人所有。
+  本站为非官方玩家项目，与官方不存在授权、合作或运营关系。
+
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tooltips
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色模式
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - 首页: index.md
+  - 研究笔记: research-note.md
+  - 发布合规清单: compliance.md
+  - 关于本站: about.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+
+plugins:
+  - search:
+      lang:
+        - zh
+        - en
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Milk_AP/phi-notes
+      name: 本站在 GitHub 上的源码

@@ -1,0 +1,6 @@
+# 站点构建依赖（GitHub Actions 与本机预览共用）
+# 安装：pip install -r requirements.txt
+# 预览：mkdocs serve
+# 构建：mkdocs build
+
+mkdocs-material>=9.5,<10
