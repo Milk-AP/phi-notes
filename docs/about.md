@@ -48,7 +48,7 @@
 
 如任何**权利人**认为本站内容不妥，请通过下列任一渠道联系：
 
-- 在 [GitHub 仓库](https://github.com/Milk-AP/boke/issues) 提交 Issue；
+- 在 [GitHub 仓库](https://github.com/Milk-AP/phi-notes/issues) 提交 Issue；
 - 或通过仓库主页所列邮箱联系。
 
 我们将在核实后**立即删除**相关内容，无需其他程序。
