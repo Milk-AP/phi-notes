@@ -5,12 +5,17 @@
  *       只会清空占位元素、没有填回 SVG，导致图表整体不显示；它也没有提供
  *       任何缩放手段，宽图上的文字小到无法阅读。
  *
- * 所以这里改为自行渲染，并补上缩放/平移：
+ * 所以这里改为自行渲染，并补上缩放：
  *   · 自管 Mermaid 渲染（库由 mkdocs.yml 的 extra_javascript 本地引入，不依赖 CDN）
  *   · 滚轮缩放（以光标位置为中心）
- *   · 按住拖动平移
+ *   · 桌面端按住拖动；触屏走浏览器原生滚动，天然支持单指拖动与双指缩放
  *   · 双击重置
  *   · 工具栏：缩小 / 适应宽度 / 原始大小 / 放大
+ *
+ * 实现要点：缩放直接改写 SVG 的 width / height，而不是用 CSS transform: scale()。
+ * 因为 transform 不参与布局，容器高度会按未缩放的原始尺寸撑开，在长图下方留下
+ * 大片空白（实测图高 78px 而容器高 802px）。改写 width/height 后布局尺寸与视觉
+ * 尺寸一致，容器高度自动贴合。
  *
  * 依赖：custom_fences 的 class 必须是 mermaid-diagram（见 mkdocs.yml），
  *       这样才能避开 Material 自己的处理流程。
@@ -47,7 +52,7 @@
       startOnLoad: false,
       securityLevel: "loose",
       theme: "default",
-      // 关掉 useMaxWidth，让 SVG 保留自然尺寸，缩放交给 CSS transform
+      // 关掉 useMaxWidth，让 SVG 带上自然尺寸，缩放由脚本接管
       flowchart: { useMaxWidth: false },
       sequence: { useMaxWidth: false },
       gantt: { useMaxWidth: false }
@@ -127,36 +132,39 @@
       viewBox && viewBox.width
         ? viewBox.width
         : svg.getBoundingClientRect().width;
+    var naturalHeight =
+      viewBox && viewBox.height
+        ? viewBox.height
+        : svg.getBoundingClientRect().height;
 
     svg.style.maxWidth = "none";
-    svg.style.width = naturalWidth + "px";
-    svg.style.height = "auto";
-    svg.style.transformOrigin = "0 0";
 
     /* ------------------------------ 状态 ------------------------------ */
     var scale = 1;
-    var offsetX = 0;
-    var offsetY = 0;
 
-    function apply() {
-      svg.style.transform =
-        "translate(" + offsetX + "px, " + offsetY + "px) scale(" + scale + ")";
+    // 关键：改写 width / height 而不是用 transform: scale()，
+    // 这样布局尺寸与视觉尺寸一致，容器不会留下大片空白。
+    function setScale(next) {
+      scale = next;
+      svg.style.width = naturalWidth * scale + "px";
+      svg.style.height = naturalHeight * scale + "px";
     }
 
-    function zoomAt(factor, anchorX, anchorY) {
+    // 以视口内某点为锚点缩放，保持该点下方的内容不动
+    function zoomAt(factor, viewportX, viewportY) {
       var next = clamp(scale * factor, MIN_SCALE, MAX_SCALE);
-      var ratio = next / scale;
-      offsetX = anchorX - ratio * (anchorX - offsetX);
-      offsetY = anchorY - ratio * (anchorY - offsetY);
-      scale = next;
-      apply();
+      if (next === scale) return;
+      var contentX = (stage.scrollLeft + viewportX) / scale;
+      var contentY = (stage.scrollTop + viewportY) / scale;
+      setScale(next);
+      stage.scrollLeft = contentX * next - viewportX;
+      stage.scrollTop = contentY * next - viewportY;
     }
 
     function reset() {
-      scale = 1;
-      offsetX = 0;
-      offsetY = 0;
-      apply();
+      setScale(1);
+      stage.scrollLeft = 0;
+      stage.scrollTop = 0;
     }
 
     function fitWidth() {
@@ -166,15 +174,13 @@
       var available = stage.clientWidth - padding;
       if (!naturalWidth || available <= 0) return;
       // 只缩小、不放大：图比容器窄时保持原始大小
-      scale = clamp(Math.min(1, available / naturalWidth), FIT_FLOOR, MAX_SCALE);
-      offsetX = 0;
-      offsetY = 0;
-      apply();
+      setScale(clamp(Math.min(1, available / naturalWidth), FIT_FLOOR, MAX_SCALE));
+      stage.scrollLeft = 0;
+      stage.scrollTop = 0;
     }
 
     function zoomFromCenter(factor) {
-      var rect = stage.getBoundingClientRect();
-      zoomAt(factor, rect.width / 2, rect.height / 2);
+      zoomAt(factor, stage.clientWidth / 2, stage.clientHeight / 2);
     }
 
     /* ------------------- 滚轮缩放（以光标为中心） ------------------- */
@@ -192,52 +198,39 @@
       { passive: false }
     );
 
-    /* ----------------------------- 拖动平移 ----------------------------- */
+    /* ------------- 桌面端鼠标按住拖动（触屏交给原生滚动） ------------- */
     var dragging = false;
-    var startX = 0;
-    var startY = 0;
-    var startOffsetX = 0;
-    var startOffsetY = 0;
+    var dragStartX = 0;
+    var dragStartY = 0;
+    var dragScrollLeft = 0;
+    var dragScrollTop = 0;
 
     stage.addEventListener("pointerdown", function (event) {
-      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
       dragging = true;
-      startX = event.clientX;
-      startY = event.clientY;
-      startOffsetX = offsetX;
-      startOffsetY = offsetY;
+      dragStartX = event.clientX;
+      dragStartY = event.clientY;
+      dragScrollLeft = stage.scrollLeft;
+      dragScrollTop = stage.scrollTop;
       stage.classList.add("mz-dragging");
-      if (stage.setPointerCapture) {
-        try {
-          stage.setPointerCapture(event.pointerId);
-        } catch (err) {
-          /* 捕获失败不影响基本拖动 */
-        }
-      }
+      event.preventDefault();
     });
 
     stage.addEventListener("pointermove", function (event) {
       if (!dragging) return;
-      offsetX = startOffsetX + (event.clientX - startX);
-      offsetY = startOffsetY + (event.clientY - startY);
-      apply();
+      stage.scrollLeft = dragScrollLeft - (event.clientX - dragStartX);
+      stage.scrollTop = dragScrollTop - (event.clientY - dragStartY);
     });
 
-    function endDrag(event) {
+    function endDrag() {
       if (!dragging) return;
       dragging = false;
       stage.classList.remove("mz-dragging");
-      if (stage.releasePointerCapture && event.pointerId !== undefined) {
-        try {
-          stage.releasePointerCapture(event.pointerId);
-        } catch (err) {
-          /* 已释放则忽略 */
-        }
-      }
     }
 
     stage.addEventListener("pointerup", endDrag);
     stage.addEventListener("pointercancel", endDrag);
+    stage.addEventListener("pointerleave", endDrag);
 
     /* ----------------------------- 双击重置 ----------------------------- */
     stage.addEventListener("dblclick", reset);
