@@ -20,7 +20,7 @@
 - 游戏内音乐、音效、曲绘及其他内容的相关权利，归**各自创作者、音乐厂牌、发行方或其他权利人**所有。
 - 本站仅在"为说明研究对象"的范围内作**描述性引用**；文中的曲名、路径等仅作为说明性引用与权利归属标注，
   **不构成**对相关作品的再许可，也不代表任何人可以自由提取或再传播对应内容。
-- 站内使用的第三方开源库（`androguard`、`pyelftools`、`capstone`、`UnityPy`、`MkDocs Material`）
+- 站内使用的第三方开源库（`androguard`、`pyelftools`、`capstone`、`UnityPy`、`MkDocs Material`、`Mermaid`）
   分别遵循其各自的许可证。
 
 ---
@@ -58,7 +58,7 @@
 ## 站点技术栈
 
 - 静态站点生成：[MkDocs](https://www.mkdocs.org/) + [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
-- 图表渲染：Mermaid（站点主题内置支持，**全站无位图素材**）
+- 图表渲染：[Mermaid](https://mermaid.js.org/)（**本地托管**，不依赖 CDN；支持滚轮缩放与拖动平移，**全站无位图素材**）
 - 托管：[GitHub Pages](https://pages.github.com/)
 - 构建与发布：GitHub Actions（推送 `main` 自动构建）
 - 站内检索：Material 内置离线搜索（中英文分词）

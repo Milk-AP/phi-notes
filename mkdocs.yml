@@ -74,8 +74,11 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
+        # class 刻意不叫 mermaid：Material 自带的 Mermaid 集成在 9.7.x
+        # 会清空占位元素却填不回 SVG，导致图表整体不显示。
+        # 改用自定义 class，由 javascripts/mermaid.js 自行渲染。
         - name: mermaid
-          class: mermaid
+          class: mermaid-diagram
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
@@ -90,6 +93,14 @@ plugins:
       lang:
         - zh
         - en
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  # Mermaid 库本地托管：不依赖 unpkg CDN，避免 CDN 不可达时图表整体消失
+  - javascripts/mermaid.min.js
+  - javascripts/mermaid.js
 
 extra:
   generator: false

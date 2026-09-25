@@ -1,0 +1,100 @@
+/* ---------------------------------------------------------------------------
+ * Mermaid 图缩放 / 平移（配合 javascripts/mermaid-zoom.js）
+ *
+ * 由脚本在运行时把每个 .mermaid 包进 .mz-wrapper > .mz-stage，
+ * 并追加一个 .mz-bar 工具栏。下面只负责外观与交互提示。
+ * --------------------------------------------------------------------------- */
+
+.mz-wrapper {
+  position: relative;
+  margin: 1.2em 0;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+  background-color: var(--md-default-bg-color);
+}
+
+.mz-stage {
+  overflow: hidden;
+  padding: 0.6rem;
+  cursor: grab;
+  /* 交给脚本处理拖动手势，避免与页面滚动打架 */
+  touch-action: none;
+}
+
+.mz-stage.mz-dragging {
+  cursor: grabbing;
+}
+
+/* 图内容由脚本固定为自然宽度，这里只清除主题的宽度限制 */
+.mz-stage .mermaid-diagram,
+.mz-stage > .mermaid-diagram {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  overflow: visible;
+}
+
+.mz-stage svg {
+  display: block;
+  max-width: none !important;
+  transform-origin: 0 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ------------------------------- 工具栏 ------------------------------- */
+
+.mz-bar {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  display: flex;
+  gap: 0.2rem;
+  z-index: 2;
+  opacity: 0.25;
+  transition: opacity 150ms ease;
+}
+
+.mz-wrapper:hover .mz-bar,
+.mz-bar:focus-within {
+  opacity: 1;
+}
+
+.mz-bar button {
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--md-default-fg-color);
+  background-color: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+  cursor: pointer;
+}
+
+.mz-bar button:hover {
+  color: var(--md-primary-bg-color);
+  background-color: var(--md-primary-fg-color);
+  border-color: var(--md-primary-fg-color);
+}
+
+/* 触屏设备上没有 hover，工具栏常驻可见 */
+@media (hover: none) {
+  .mz-bar {
+    opacity: 1;
+  }
+}
+
+@media print {
+  .mz-bar {
+    display: none;
+  }
+
+  .mz-stage {
+    overflow: visible;
+    touch-action: auto;
+  }
+}
